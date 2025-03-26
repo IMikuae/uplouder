@@ -13,15 +13,16 @@ export default function Home() {
     if (!file) return alert("Pilih file terlebih dahulu!");
 
     setUploading(true);
-    const formData = new FormData();
-    formData.append("file", file);
-
+const formData = new FormData();
+formData.append("file", fileInput.files[0]);
     try {
       const res = await fetch("/api/upload", {
-        method: "POST",
-        body: formData,
-      });
-
+  method: "POST",
+  body: formData,
+})
+  .then((res) => res.json())
+  .then((data) => console.log("Uploaded:", data))
+  .catch((err) => console.error("Upload Error:", err));
       const data = await res.json();
       if (data.success) {
         setFileUrl(data.url);
