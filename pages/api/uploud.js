@@ -1,42 +1,37 @@
-import formidable from "formidable";
 import { put } from "@vercel/blob";
-import fs from "fs/promises";
-import path from "path";
+import formidable from "formidable";
 
 export const config = {
   api: {
-    bodyParser: false, // Matikan bodyParser agar bisa menerima FormData
+    bodyParser: false, // Matikan bodyParser agar formidable bisa bekerja
   },
 };
 
 export default async function handler(req, res) {
   if (req.method !== "POST") {
-    return res.status(405).json({ error: "Method Not Allowed" });
+    return res.status(405).json({ error: "Method not allowed" });
   }
 
   try {
-    // 1️⃣ Parsing FormData menggunakan formidable
+    // Gunakan formidable untuk parsing file
     const form = new formidable.IncomingForm();
-    const [fields, files] = await form.parse(req);
+    form.parse(req, async (err, fields, files) => {
+      if (err) {
+        return res.status(500).json({ error: "File parsing error" });
+      }
 
-    if (!files.file) {
-      return res.status(400).json({ error: "No file uploaded" });
-    }
+      // Ambil file pertama yang di-upload
+      const file = files.file[0]; // Formidable v2 menyimpan file dalam array
 
-    const file = files.file[0]; // Ambil file pertama
-    const fileBuffer = await fs.readFile(file.filepath); // Baca file sebagai buffer
+      // Upload ke Vercel Blob Storage
+      const blob = await put(file.originalFilename, file.filepath, {
+        access: "public", // File bisa diakses secara publik
+      });
 
-    // 2️⃣ Upload ke Vercel Blob Storage
-    const blob = await put(file.originalFilename, fileBuffer, {
-      access: "public", // Pastikan bisa diakses secara publik
-    });
-
-    return res.status(200).json({
-      success: true,
-      fileUrl: blob.url, // ✅ URL hasil upload
+      return res.status(200).json({ success: true, url: blob.url });
     });
   } catch (error) {
-    console.error("Upload Error:", error);
-    return res.status(500).json({ error: "Upload failed" });
+    console.error("Upload error:", error);
+    res.status(500).json({ error: "Upload failed" });
   }
 }
