@@ -24,16 +24,16 @@ export default function Home() {
 
       const data = await response.json();
       if (data.success) {
-        setFileUrl(data.fileUrl);
+        setFileUrl(data.url);
       } else {
         alert("Upload gagal!");
       }
     } catch (error) {
       console.error("Upload error:", error);
-      alert("Terjadi kesalahan saat mengupload!");
+      alert("Terjadi kesalahan!");
+    } finally {
+      setUploading(false);
     }
-
-    setUploading(false);
   };
 
   return (
@@ -44,9 +44,12 @@ export default function Home() {
         {uploading ? "Uploading..." : "Upload"}
       </button>
       {fileUrl && (
-        <p>
-          ✅ File berhasil diupload: <a href={fileUrl} target="_blank">{fileUrl}</a>
-        </p>
+        <div>
+          <p>File berhasil di-upload:</p>
+          <a href={fileUrl} target="_blank" rel="noopener noreferrer">
+            {fileUrl}
+          </a>
+        </div>
       )}
     </div>
   );
