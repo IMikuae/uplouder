@@ -1,5 +1,5 @@
-import { parseForm } from "../utils/formidableHelper";
-import { put } from "../vercel/blob";
+import { parseForm } from "../utils/formidableHelper"; // Sesuai dengan struktur folder
+import { put } from "@vercel/blob";
 
 export const config = {
   api: {
