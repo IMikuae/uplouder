@@ -1,4 +1,4 @@
-import { parseForm } from "../utils/formidableHelper"; // Sesuai dengan struktur folder
+import { parseForm } from "../../utils/formidableHelper"; // Sesuai dengan struktur folder
 import { put } from "@vercel/blob";
 
 export const config = {
